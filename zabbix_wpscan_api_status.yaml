@@ -1,0 +1,267 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-09-30T05:13:22Z'
+  groups:
+    -
+      uuid: c1042abaca9d435ca00326c24768d8b8
+      name: 'API Providers'
+  templates:
+    -
+      uuid: 686ea4e212e14953b998a678c55c942c
+      template: 'WPScan API Provider'
+      name: 'WPScan API Provider'
+      description: |
+        WPScan API Provider
+        
+        https://wpscan.com/api
+      groups:
+        -
+          name: 'API Providers'
+      items:
+        -
+          uuid: 2759d8df62264d8e86f40ccc96b57172
+          name: 'WPScan API Data'
+          type: HTTP_AGENT
+          key: wpscan.api.data
+          history: 1h
+          trends: '0'
+          value_type: TEXT
+          url: 'https://wpscan.com/api/v3/status'
+          headers:
+            -
+              name: Authorization
+              value: 'Token token={$WPSCAN_API}'
+            -
+              name: accept
+              value: application/json
+        -
+          uuid: 332b1761a0014c76bd79a00aa82b7ce2
+          name: 'WPScan Plan'
+          type: DEPENDENT
+          key: wpscan.api.plan
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.plan
+          master_item:
+            key: wpscan.api.data
+          triggers:
+            -
+              uuid: 5883dab005dd48c08d441e1ddda7a62c
+              expression: 'change(/WPScan API Provider/wpscan.api.plan)<>0'
+              recovery_mode: NONE
+              name: 'WPScan API plan has changed'
+              event_name: 'WPScan API plan has changed'
+              opdata: wpscan.api.plan
+              priority: WARNING
+              description: |
+                The WPScan Plan has changed. 
+                New Plan:  {ITEM.LASTVALUE1}
+              manual_close: 'YES'
+        -
+          uuid: f05b6b756b1f46709a2073aedb847ca5
+          name: 'WPScan Requests Used'
+          type: CALCULATED
+          key: wpscan.api.requests.count
+          units: Requests
+          params: 'last(//wpscan.api.requests.limit) - last(//wpscan.api.requests.remaining)'
+        -
+          uuid: 0efb62f8b44942519af6a1ab5326151b
+          name: 'WPScan Requests Used (change)'
+          type: DEPENDENT
+          key: wpscan.api.requests.count.change
+          delay: '0'
+          units: Requests
+          preprocessing:
+            -
+              type: SIMPLE_CHANGE
+              parameters:
+                - ''
+          master_item:
+            key: wpscan.api.requests.count
+        -
+          uuid: 70525e94102149f2bb7c42c7c4d7f7c3
+          name: 'WPScan Requests Limit'
+          type: DEPENDENT
+          key: wpscan.api.requests.limit
+          delay: '0'
+          units: Requests
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests_limit
+          master_item:
+            key: wpscan.api.data
+          triggers:
+            -
+              uuid: 0b63fef39751498fb2bbdbf86e997374
+              expression: 'change(/WPScan API Provider/wpscan.api.requests.limit)<>0'
+              recovery_mode: NONE
+              name: 'WPScan API Requests Limit has Changed'
+              event_name: 'WPScan API Requests Limit has Changed'
+              opdata: wpscan.api.plan
+              priority: WARNING
+              description: |
+                The WPScan Plan has changed. 
+                New Plan:  {ITEM.LASTVALUE1}
+              manual_close: 'YES'
+        -
+          uuid: 4963a2808fca4d7abc446e1a7443ee1a
+          name: 'WPScan Requests Remaining'
+          type: DEPENDENT
+          key: wpscan.api.requests.remaining
+          delay: '0'
+          units: Requests
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.requests_remaining
+          master_item:
+            key: wpscan.api.data
+          triggers:
+            -
+              uuid: 7f79965c9a6f413e9e0586dd91e0c41c
+              expression: 'last(/WPScan API Provider/wpscan.api.requests.remaining)<1'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/WPScan API Provider/wpscan.api.requests.remaining)<1'
+              name: 'WPScan - Remaining Requests Reached Zero'
+              event_name: 'WPScan - Remaining Requests Reached Zero'
+              opdata: wpscan.api.requests.remaining
+              priority: DISASTER
+              description: 'WPScan - Remaining Requests Reached Zero'
+              manual_close: 'YES'
+      macros:
+        -
+          macro: '{$WPSCAN_API}'
+          description: 'API Key for WPScan'
+      dashboards:
+        -
+          uuid: c337b380965e4e5287475e50c4144577
+          name: 'WPScan API Status'
+          pages:
+            -
+              widgets:
+                -
+                  type: GRAPH_CLASSIC
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'WPScan Requests Used/Limit'
+                        host: 'WPScan API Provider'
+                -
+                  type: PLAIN_TEXT
+                  'y': '5'
+                  width: '12'
+                  height: '3'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: style
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: show_lines
+                      value: '1'
+                    -
+                      type: INTEGER
+                      name: show_as_html
+                      value: '1'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: wpscan.api.plan
+                        host: 'WPScan API Provider'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: wpscan.api.requests.limit
+                        host: 'WPScan API Provider'
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        key: wpscan.api.requests.remaining
+                        host: 'WPScan API Provider'
+  triggers:
+    -
+      uuid: 12c6d0189263490a8883e121a0d13d6b
+      expression: 'last(/WPScan API Provider/wpscan.api.requests.remaining) < last(/WPScan API Provider/wpscan.api.requests.limit)*.5'
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: 'last(/WPScan API Provider/wpscan.api.requests.remaining) > last(/WPScan API Provider/wpscan.api.requests.limit)*.5'
+      name: 'WPScan - Less than 50% of Allocation Remaining'
+      event_name: 'WPScan - Less than 50% of Allocation Remaining'
+      opdata: wpscan.api.requests.remaining
+      priority: INFO
+      description: 'WPScan - Less than 50% of Allocation Remaining'
+      manual_close: 'YES'
+    -
+      uuid: db50c7ee96474719b4b9785876e2a484
+      expression: 'last(/WPScan API Provider/wpscan.api.requests.remaining) < last(/WPScan API Provider/wpscan.api.requests.limit)*.25'
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: 'last(/WPScan API Provider/wpscan.api.requests.remaining) > last(/WPScan API Provider/wpscan.api.requests.limit)*.25'
+      name: 'WPScan - Less than 75% of Allocation Remaining'
+      event_name: 'WPScan - Less than 75% of Allocation Remaining'
+      opdata: wpscan.api.requests.remaining
+      priority: WARNING
+      description: 'WPScan - Less than 25% of Allocation Remaining'
+      manual_close: 'YES'
+    -
+      uuid: 574a75c896e747169b3d51c70a66be6a
+      expression: 'last(/WPScan API Provider/wpscan.api.requests.remaining) < last(/WPScan API Provider/wpscan.api.requests.limit)*.10'
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: 'last(/WPScan API Provider/wpscan.api.requests.remaining) > last(/WPScan API Provider/wpscan.api.requests.limit)*.10'
+      name: 'WPScan - Less than 90% of Allocation Remaining'
+      event_name: 'WPScan - Less than 90% of Allocation Remaining'
+      opdata: wpscan.api.requests.remaining
+      priority: HIGH
+      description: 'WPScan - Less than 10% of Allocation Remaining'
+      manual_close: 'YES'
+  graphs:
+    -
+      uuid: 5d92ee433cab4d129cf8ee9a24c9e241
+      name: 'WP Scan API Requests Remaining'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'WPScan API Provider'
+            key: wpscan.api.requests.remaining
+    -
+      uuid: 24ad393d94984e17ad5727b88a5a2b4c
+      name: 'WPSCan API Requests Used'
+      graph_items:
+        -
+          sortorder: '1'
+          color: FF0080
+          item:
+            host: 'WPScan API Provider'
+            key: wpscan.api.requests.count
+    -
+      uuid: c1cd434a09b047ebab7b5402228795e0
+      name: 'WPScan Requests Used/Limit'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'WPScan API Provider'
+            key: wpscan.api.requests.count
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'WPScan API Provider'
+            key: wpscan.api.requests.remaining
