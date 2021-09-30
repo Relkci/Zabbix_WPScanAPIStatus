@@ -25,8 +25,22 @@ The template uses an HTTP agent item to set a parent data item.  Dependent items
 - 10% Limit Remaining
 - 0 Requests Remaining
 
+## Screenshots
+
+### Host Data
+
+![](screenshots/screen1.png)
+
+### Triggers
+
+![](screenshots/screen2.png)
+
+
 ## License
 Apache 2
 
 ## Contact
-@krelkci
+@krelkci (twitter) @relkci (github)  
+
+## Thanks
+Black Hills Information Security https://www.blackhillsinfosec.com
