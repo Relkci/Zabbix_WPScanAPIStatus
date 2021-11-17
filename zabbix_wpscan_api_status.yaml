@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-09-30T05:13:22Z'
+  date: '2021-11-17T22:57:10Z'
   groups:
     -
       uuid: c1042abaca9d435ca00326c24768d8b8
@@ -23,6 +23,7 @@ zabbix_export:
           name: 'WPScan API Data'
           type: HTTP_AGENT
           key: wpscan.api.data
+          delay: 5m
           history: 1h
           trends: '0'
           value_type: TEXT
@@ -34,6 +35,13 @@ zabbix_export:
             -
               name: accept
               value: application/json
+          tags:
+            -
+              tag: Application
+              value: WPScan
+            -
+              tag: WPScan
+              value: Data
         -
           uuid: 332b1761a0014c76bd79a00aa82b7ce2
           name: 'WPScan Plan'
@@ -49,6 +57,13 @@ zabbix_export:
                 - $.plan
           master_item:
             key: wpscan.api.data
+          tags:
+            -
+              tag: Application
+              value: WPScan
+            -
+              tag: WPScan
+              value: Account
           triggers:
             -
               uuid: 5883dab005dd48c08d441e1ddda7a62c
@@ -64,11 +79,18 @@ zabbix_export:
               manual_close: 'YES'
         -
           uuid: f05b6b756b1f46709a2073aedb847ca5
-          name: 'WPScan Requests Used'
+          name: 'WPScan Requests Remaining'
           type: CALCULATED
           key: wpscan.api.requests.count
           units: Requests
           params: 'last(//wpscan.api.requests.limit) - last(//wpscan.api.requests.remaining)'
+          tags:
+            -
+              tag: Application
+              value: WPScan
+            -
+              tag: WPScan
+              value: Used
         -
           uuid: 0efb62f8b44942519af6a1ab5326151b
           name: 'WPScan Requests Used (change)'
@@ -83,6 +105,10 @@ zabbix_export:
                 - ''
           master_item:
             key: wpscan.api.requests.count
+          tags:
+            -
+              tag: Application
+              value: WPScan
         -
           uuid: 70525e94102149f2bb7c42c7c4d7f7c3
           name: 'WPScan Requests Limit'
@@ -97,6 +123,13 @@ zabbix_export:
                 - $.requests_limit
           master_item:
             key: wpscan.api.data
+          tags:
+            -
+              tag: Application
+              value: WPScan
+            -
+              tag: WPScan
+              value: Allowance
           triggers:
             -
               uuid: 0b63fef39751498fb2bbdbf86e997374
@@ -124,6 +157,13 @@ zabbix_export:
                 - $.requests_remaining
           master_item:
             key: wpscan.api.data
+          tags:
+            -
+              tag: Application
+              value: WPScan
+            -
+              tag: WPScan
+              value: Remaining
           triggers:
             -
               uuid: 7f79965c9a6f413e9e0586dd91e0c41c
@@ -136,6 +176,34 @@ zabbix_export:
               priority: DISASTER
               description: 'WPScan - Remaining Requests Reached Zero'
               manual_close: 'YES'
+      httptests:
+        -
+          uuid: 6f2ba8f6208644be8990d69d0cf580b8
+          name: 'WPScan Request HTTPS Stats'
+          delay: 5m
+          steps:
+            -
+              name: 'API Call'
+              url: 'https://wpscan.com/api/v3/status'
+              headers:
+                -
+                  name: Authorization
+                  value: 'Token token={$WPSCAN_API}'
+                -
+                  name: accept
+                  value: application/json
+              follow_redirects: 'NO'
+              status_codes: '200'
+      tags:
+        -
+          tag: API
+          value: WPscan
+        -
+          tag: Application
+          value: API
+        -
+          tag: Application
+          value: WPScan
       macros:
         -
           macro: '{$WPSCAN_API}'
@@ -240,12 +308,12 @@ zabbix_export:
             host: 'WPScan API Provider'
             key: wpscan.api.requests.remaining
     -
-      uuid: 24ad393d94984e17ad5727b88a5a2b4c
+      uuid: 9d037e6d86544b7f8aa6f66b598337e9
       name: 'WPSCan API Requests Used'
       graph_items:
         -
           sortorder: '1'
-          color: FF0080
+          color: 1A7C11
           item:
             host: 'WPScan API Provider'
             key: wpscan.api.requests.count

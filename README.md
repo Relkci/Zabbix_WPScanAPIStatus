@@ -25,6 +25,24 @@ The template uses an HTTP agent item to set a parent data item.  Dependent items
 - 10% Limit Remaining
 - 0 Requests Remaining
 
+## Tags
+- Application:WPScan
+- Application:API
+- API:WPScan
+- WPScan:Data (API JSON Data Source)
+- WPScan:Remaining (API Credits Remaining)
+- WPScan:Used (API Credits Used)
+- WPScan:Allowance (API Credits Allowed)
+- WPScan:Account (account information)
+
+## WebScenarios
+- API Endpoint Check
+
+## Graphs
+- WP Scan API Credits Remaining
+- WP Scan API Credits Used
+- WP Scan API Credits Used/Limit
+
 ## Screenshots
 
 ### Host Data
@@ -34,6 +52,15 @@ The template uses an HTTP agent item to set a parent data item.  Dependent items
 ### Triggers
 
 ![](screenshots/screen2.png)
+
+### Dashboard - WPScan Credits Used/Limit
+![](screenshots/screen3.png)
+
+### Dashboard - Account Information 
+![](screenshots/screen4.png)
+
+## Updates
+- Nov 17 2021: added screenshots, added export format, added tags
 
 
 ## License

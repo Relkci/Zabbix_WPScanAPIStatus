@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="utf-8"?>
+<zabbix_export>
+	<version>5.4</version>
+	<date>2021-11-17T22:57:37Z</date>
+	<groups>
+		<group>
+			<uuid>c1042abaca9d435ca00326c24768d8b8</uuid>
+			<name>API Providers</name>
+		</group>
+	</groups>
+	<templates>
+		<template>
+			<uuid>686ea4e212e14953b998a678c55c942c</uuid>
+			<template>WPScan API Provider</template>
+			<name>WPScan API Provider</name>
+			<description>
+				WPScan API Provider
+
+				https://wpscan.com/api
+			</description>
+			<groups>
+				<group>
+					<name>API Providers</name>
+				</group>
+			</groups>
+			<items>
+				<item>
+					<uuid>2759d8df62264d8e86f40ccc96b57172</uuid>
+					<name>WPScan API Data</name>
+					<type>HTTP_AGENT</type>
+					<key>wpscan.api.data</key>
+					<delay>5m</delay>
+					<history>1h</history>
+					<trends>0</trends>
+					<value_type>TEXT</value_type>
+					<url>https://wpscan.com/api/v3/status</url>
+					<headers>
+						<header>
+							<name>Authorization</name>
+							<value>Token token={$WPSCAN_API}</value>
+						</header>
+						<header>
+							<name>accept</name>
+							<value>application/json</value>
+						</header>
+					</headers>
+					<tags>
+						<tag>
+							<tag>Application</tag>
+							<value>WPScan</value>
+						</tag>
+						<tag>
+							<tag>WPScan</tag>
+							<value>Data</value>
+						</tag>
+					</tags>
+				</item>
+				<item>
+					<uuid>332b1761a0014c76bd79a00aa82b7ce2</uuid>
+					<name>WPScan Plan</name>
+					<type>DEPENDENT</type>
+					<key>wpscan.api.plan</key>
+					<delay>0</delay>
+					<trends>0</trends>
+					<value_type>TEXT</value_type>
+					<preprocessing>
+						<step>
+							<type>JSONPATH</type>
+							<parameters>
+								<parameter>$.plan</parameter>
+							</parameters>
+						</step>
+					</preprocessing>
+					<master_item>
+						<key>wpscan.api.data</key>
+					</master_item>
+					<tags>
+						<tag>
+							<tag>Application</tag>
+							<value>WPScan</value>
+						</tag>
+						<tag>
+							<tag>WPScan</tag>
+							<value>Account</value>
+						</tag>
+					</tags>
+					<triggers>
+						<trigger>
+							<uuid>5883dab005dd48c08d441e1ddda7a62c</uuid>
+							<expression>change(/WPScan API Provider/wpscan.api.plan)&lt;&gt;0</expression>
+							<recovery_mode>NONE</recovery_mode>
+							<name>WPScan API plan has changed</name>
+							<event_name>WPScan API plan has changed</event_name>
+							<opdata>wpscan.api.plan</opdata>
+							<priority>WARNING</priority>
+							<description>
+								The WPScan Plan has changed.
+								New Plan:  {ITEM.LASTVALUE1}
+							</description>
+							<manual_close>YES</manual_close>
+						</trigger>
+					</triggers>
+				</item>
+				<item>
+					<uuid>f05b6b756b1f46709a2073aedb847ca5</uuid>
+					<name>WPScan Requests Remaining</name>
+					<type>CALCULATED</type>
+					<key>wpscan.api.requests.count</key>
+					<units>Requests</units>
+					<params>last(//wpscan.api.requests.limit) - last(//wpscan.api.requests.remaining)</params>
+					<tags>
+						<tag>
+							<tag>Application</tag>
+							<value>WPScan</value>
+						</tag>
+						<tag>
+							<tag>WPScan</tag>
+							<value>Used</value>
+						</tag>
+					</tags>
+				</item>
+				<item>
+					<uuid>0efb62f8b44942519af6a1ab5326151b</uuid>
+					<name>WPScan Requests Used (change)</name>
+					<type>DEPENDENT</type>
+					<key>wpscan.api.requests.count.change</key>
+					<delay>0</delay>
+					<units>Requests</units>
+					<preprocessing>
+						<step>
+							<type>SIMPLE_CHANGE</type>
+							<parameters>
+								<parameter/>
+							</parameters>
+						</step>
+					</preprocessing>
+					<master_item>
+						<key>wpscan.api.requests.count</key>
+					</master_item>
+					<tags>
+						<tag>
+							<tag>Application</tag>
+							<value>WPScan</value>
+						</tag>
+					</tags>
+				</item>
+				<item>
+					<uuid>70525e94102149f2bb7c42c7c4d7f7c3</uuid>
+					<name>WPScan Requests Limit</name>
+					<type>DEPENDENT</type>
+					<key>wpscan.api.requests.limit</key>
+					<delay>0</delay>
+					<units>Requests</units>
+					<preprocessing>
+						<step>
+							<type>JSONPATH</type>
+							<parameters>
+								<parameter>$.requests_limit</parameter>
+							</parameters>
+						</step>
+					</preprocessing>
+					<master_item>
+						<key>wpscan.api.data</key>
+					</master_item>
+					<tags>
+						<tag>
+							<tag>Application</tag>
+							<value>WPScan</value>
+						</tag>
+						<tag>
+							<tag>WPScan</tag>
+							<value>Allowance</value>
+						</tag>
+					</tags>
+					<triggers>
+						<trigger>
+							<uuid>0b63fef39751498fb2bbdbf86e997374</uuid>
+							<expression>change(/WPScan API Provider/wpscan.api.requests.limit)&lt;&gt;0</expression>
+							<recovery_mode>NONE</recovery_mode>
+							<name>WPScan API Requests Limit has Changed</name>
+							<event_name>WPScan API Requests Limit has Changed</event_name>
+							<opdata>wpscan.api.plan</opdata>
+							<priority>WARNING</priority>
+							<description>
+								The WPScan Plan has changed.
+								New Plan:  {ITEM.LASTVALUE1}
+							</description>
+							<manual_close>YES</manual_close>
+						</trigger>
+					</triggers>
+				</item>
+				<item>
+					<uuid>4963a2808fca4d7abc446e1a7443ee1a</uuid>
+					<name>WPScan Requests Remaining</name>
+					<type>DEPENDENT</type>
+					<key>wpscan.api.requests.remaining</key>
+					<delay>0</delay>
+					<units>Requests</units>
+					<preprocessing>
+						<step>
+							<type>JSONPATH</type>
+							<parameters>
+								<parameter>$.requests_remaining</parameter>
+							</parameters>
+						</step>
+					</preprocessing>
+					<master_item>
+						<key>wpscan.api.data</key>
+					</master_item>
+					<tags>
+						<tag>
+							<tag>Application</tag>
+							<value>WPScan</value>
+						</tag>
+						<tag>
+							<tag>WPScan</tag>
+							<value>Remaining</value>
+						</tag>
+					</tags>
+					<triggers>
+						<trigger>
+							<uuid>7f79965c9a6f413e9e0586dd91e0c41c</uuid>
+							<expression>last(/WPScan API Provider/wpscan.api.requests.remaining)&lt;1</expression>
+							<recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+							<recovery_expression>last(/WPScan API Provider/wpscan.api.requests.remaining)&lt;1</recovery_expression>
+							<name>WPScan - Remaining Requests Reached Zero</name>
+							<event_name>WPScan - Remaining Requests Reached Zero</event_name>
+							<opdata>wpscan.api.requests.remaining</opdata>
+							<priority>DISASTER</priority>
+							<description>WPScan - Remaining Requests Reached Zero</description>
+							<manual_close>YES</manual_close>
+						</trigger>
+					</triggers>
+				</item>
+			</items>
+			<httptests>
+				<httptest>
+					<uuid>6f2ba8f6208644be8990d69d0cf580b8</uuid>
+					<name>WPScan Request HTTPS Stats</name>
+					<delay>5m</delay>
+					<steps>
+						<step>
+							<name>API Call</name>
+							<url>https://wpscan.com/api/v3/status</url>
+							<headers>
+								<header>
+									<name>Authorization</name>
+									<value>Token token={$WPSCAN_API}</value>
+								</header>
+								<header>
+									<name>accept</name>
+									<value>application/json</value>
+								</header>
+							</headers>
+							<follow_redirects>NO</follow_redirects>
+							<status_codes>200</status_codes>
+						</step>
+					</steps>
+				</httptest>
+			</httptests>
+			<tags>
+				<tag>
+					<tag>API</tag>
+					<value>WPscan</value>
+				</tag>
+				<tag>
+					<tag>Application</tag>
+					<value>API</value>
+				</tag>
+				<tag>
+					<tag>Application</tag>
+					<value>WPScan</value>
+				</tag>
+			</tags>
+			<macros>
+				<macro>
+					<macro>{$WPSCAN_API}</macro>
+					<description>API Key for WPScan</description>
+				</macro>
+			</macros>
+			<dashboards>
+				<dashboard>
+					<uuid>c337b380965e4e5287475e50c4144577</uuid>
+					<name>WPScan API Status</name>
+					<pages>
+						<page>
+							<widgets>
+								<widget>
+									<type>GRAPH_CLASSIC</type>
+									<width>12</width>
+									<height>5</height>
+									<fields>
+										<field>
+											<type>GRAPH</type>
+											<name>graphid</name>
+											<value>
+												<name>WPScan Requests Used/Limit</name>
+												<host>WPScan API Provider</host>
+											</value>
+										</field>
+									</fields>
+								</widget>
+								<widget>
+									<type>PLAIN_TEXT</type>
+									<y>5</y>
+									<width>12</width>
+									<height>3</height>
+									<fields>
+										<field>
+											<type>INTEGER</type>
+											<name>style</name>
+											<value>1</value>
+										</field>
+										<field>
+											<type>INTEGER</type>
+											<name>show_lines</name>
+											<value>1</value>
+										</field>
+										<field>
+											<type>INTEGER</type>
+											<name>show_as_html</name>
+											<value>1</value>
+										</field>
+										<field>
+											<type>ITEM</type>
+											<name>itemids</name>
+											<value>
+												<key>wpscan.api.plan</key>
+												<host>WPScan API Provider</host>
+											</value>
+										</field>
+										<field>
+											<type>ITEM</type>
+											<name>itemids</name>
+											<value>
+												<key>wpscan.api.requests.limit</key>
+												<host>WPScan API Provider</host>
+											</value>
+										</field>
+										<field>
+											<type>ITEM</type>
+											<name>itemids</name>
+											<value>
+												<key>wpscan.api.requests.remaining</key>
+												<host>WPScan API Provider</host>
+											</value>
+										</field>
+									</fields>
+								</widget>
+							</widgets>
+						</page>
+					</pages>
+				</dashboard>
+			</dashboards>
+		</template>
+	</templates>
+	<triggers>
+		<trigger>
+			<uuid>12c6d0189263490a8883e121a0d13d6b</uuid>
+			<expression>last(/WPScan API Provider/wpscan.api.requests.remaining) &lt; last(/WPScan API Provider/wpscan.api.requests.limit)*.5</expression>
+			<recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+			<recovery_expression>last(/WPScan API Provider/wpscan.api.requests.remaining) &gt; last(/WPScan API Provider/wpscan.api.requests.limit)*.5</recovery_expression>
+			<name>WPScan - Less than 50% of Allocation Remaining</name>
+			<event_name>WPScan - Less than 50% of Allocation Remaining</event_name>
+			<opdata>wpscan.api.requests.remaining</opdata>
+			<priority>INFO</priority>
+			<description>WPScan - Less than 50% of Allocation Remaining</description>
+			<manual_close>YES</manual_close>
+		</trigger>
+		<trigger>
+			<uuid>db50c7ee96474719b4b9785876e2a484</uuid>
+			<expression>last(/WPScan API Provider/wpscan.api.requests.remaining) &lt; last(/WPScan API Provider/wpscan.api.requests.limit)*.25</expression>
+			<recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+			<recovery_expression>last(/WPScan API Provider/wpscan.api.requests.remaining) &gt; last(/WPScan API Provider/wpscan.api.requests.limit)*.25</recovery_expression>
+			<name>WPScan - Less than 75% of Allocation Remaining</name>
+			<event_name>WPScan - Less than 75% of Allocation Remaining</event_name>
+			<opdata>wpscan.api.requests.remaining</opdata>
+			<priority>WARNING</priority>
+			<description>WPScan - Less than 25% of Allocation Remaining</description>
+			<manual_close>YES</manual_close>
+		</trigger>
+		<trigger>
+			<uuid>574a75c896e747169b3d51c70a66be6a</uuid>
+			<expression>last(/WPScan API Provider/wpscan.api.requests.remaining) &lt; last(/WPScan API Provider/wpscan.api.requests.limit)*.10</expression>
+			<recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+			<recovery_expression>last(/WPScan API Provider/wpscan.api.requests.remaining) &gt; last(/WPScan API Provider/wpscan.api.requests.limit)*.10</recovery_expression>
+			<name>WPScan - Less than 90% of Allocation Remaining</name>
+			<event_name>WPScan - Less than 90% of Allocation Remaining</event_name>
+			<opdata>wpscan.api.requests.remaining</opdata>
+			<priority>HIGH</priority>
+			<description>WPScan - Less than 10% of Allocation Remaining</description>
+			<manual_close>YES</manual_close>
+		</trigger>
+	</triggers>
+	<graphs>
+		<graph>
+			<uuid>5d92ee433cab4d129cf8ee9a24c9e241</uuid>
+			<name>WP Scan API Requests Remaining</name>
+			<graph_items>
+				<graph_item>
+					<sortorder>1</sortorder>
+					<color>1A7C11</color>
+					<item>
+						<host>WPScan API Provider</host>
+						<key>wpscan.api.requests.remaining</key>
+					</item>
+				</graph_item>
+			</graph_items>
+		</graph>
+		<graph>
+			<uuid>9d037e6d86544b7f8aa6f66b598337e9</uuid>
+			<name>WPSCan API Requests Used</name>
+			<graph_items>
+				<graph_item>
+					<sortorder>1</sortorder>
+					<color>1A7C11</color>
+					<item>
+						<host>WPScan API Provider</host>
+						<key>wpscan.api.requests.count</key>
+					</item>
+				</graph_item>
+			</graph_items>
+		</graph>
+		<graph>
+			<uuid>c1cd434a09b047ebab7b5402228795e0</uuid>
+			<name>WPScan Requests Used/Limit</name>
+			<graph_items>
+				<graph_item>
+					<sortorder>1</sortorder>
+					<color>1A7C11</color>
+					<item>
+						<host>WPScan API Provider</host>
+						<key>wpscan.api.requests.count</key>
+					</item>
+				</graph_item>
+				<graph_item>
+					<sortorder>2</sortorder>
+					<color>F63100</color>
+					<item>
+						<host>WPScan API Provider</host>
+						<key>wpscan.api.requests.remaining</key>
+					</item>
+				</graph_item>
+			</graph_items>
+		</graph>
+	</graphs>
+</zabbix_export>
